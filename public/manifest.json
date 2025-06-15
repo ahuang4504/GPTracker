@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "GPTracker",
+  "version": "0.0.1",
+  "description": "Track how often you use ChatGPT and for what.",
+  "icons": {
+    "32": "images/icon-32.png"
+  },
+  "action": {
+    "default_popup": "./index.html",
+    "default_icon": {
+      "32": "images/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "type": "module"
+    }
+  ],
+  "permissions": ["storage", "scripting", "activeTab", "tabs", "contextMenus"],
+  "host_permissions": ["http://*/*", "https://*/*"]
+}
