@@ -40,3 +40,92 @@
 .read-the-docs {
   color: #888;
 }
+
+.login-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-input {
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.auth-button {
+  padding: 0.75rem;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.auth-button.google {
+  background-color: #db4437;
+  margin-top: 0.5rem;
+}
+
+.auth-button.logout {
+  background-color: #f87171;
+  margin-top: 1rem;
+}
+
+.auth-divider {
+  text-align: center;
+  margin: 1rem 0;
+  font-weight: bold;
+}
+
+.auth-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.auth-text-button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.auth-error {
+  color: red;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.auth-success {
+  color: green;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.dashboard {
+  text-align: center;
+  margin-top: 3rem;
+  font-family: sans-serif;
+}

@@ -24,6 +24,6 @@
       "type": "module"
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab", "tabs", "contextMenus"],
+  "permissions": ["storage", "scripting", "activeTab", "tabs", "contextMenus", "identity"],
   "host_permissions": ["http://*/*", "https://*/*"]
 }
