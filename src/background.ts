@@ -1,4 +1,4 @@
-import { getFromStorage, setToStorage } from "./utils";
+import { getFromStorage, setToStorage } from "./utils/localStorage";
 
 let lastTabId: number | null = null;
 

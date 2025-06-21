@@ -29,7 +29,7 @@ export function AuthPanel({ onLogin }: Props) {
     if (error) {
       setError(error.message);
     } else {
-      onLogin(); // trigger session refresh
+      onLogin(); 
     }
   };
 
