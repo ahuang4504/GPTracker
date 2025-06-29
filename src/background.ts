@@ -1,4 +1,8 @@
 import { getFromStorage, setToStorage } from "./utils/localStorage";
+import { supabase } from "./utils/supabase";
+import { pushVisits, readVisits } from "./utils/visit_logic";
+import { getTimeUntil } from "./utils/timeUtils";
+import { dailyResetManager } from "./utils/dailyResetManager";
 
 let lastTabId: number | null = null;
 
@@ -56,3 +60,32 @@ async function updateVisitCount() {
     console.error("Failed to update visit count", err);
   }
 }
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.alarms.create("hourlyPush", { periodInMinutes: 60 });
+  chrome.alarms.create("tenMinFetch", { periodInMinutes: 10 });
+  chrome.alarms.create("finalPush", {
+    when: getTimeUntil(23, 59, 55),
+  });
+});
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  
+  // Ensure daily reset with session if available
+  await dailyResetManager.ensureDailyReset(session || undefined);
+  
+  if (!session) return;
+
+  switch (alarm.name) {
+    case "hourlyPush":
+    case "finalPush":
+      await pushVisits(session);
+      break;
+    case "tenMinFetch":
+      await readVisits(session);
+      break;
+  }
+});

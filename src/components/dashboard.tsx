@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { getFromStorage } from "@/utils/localStorage";
 import type { Session } from "@supabase/supabase-js";
+import { listenToAuthChanges } from "@/utils/authListener";
 
 export function Dashboard({
   session,
@@ -19,20 +20,20 @@ export function Dashboard({
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    } = listenToAuthChanges(setSession);
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [setSession]);
 
   useEffect(() => {
     (async () => {
       try {
-        const { visitCount } = await getFromStorage<{ visitCount: number }>([
-          "visitCount",
-        ]);
-        setVisitCount(visitCount ?? 0);
+        const { visitCount, displayCount } = await getFromStorage<{
+          visitCount: number;
+          displayCount: number;
+        }>(["visitCount", "displayCount"]);
+        const maxCount = Math.max(visitCount ?? 0, displayCount ?? 0);
+        setVisitCount(maxCount);
       } catch (error) {
         console.error("Failed to fetch visit count:", error);
       }

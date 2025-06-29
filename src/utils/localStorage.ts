@@ -1,6 +1,9 @@
+import { dailyResetManager } from "./dailyResetManager";
+
 type StorageValue = string | number | boolean | object | null | undefined;
 
-export async function getFromStorage<T = unknown>(
+// Internal function that doesn't trigger daily reset (to prevent infinite recursion)
+export async function getFromStorageRaw<T = unknown>(
   keys: string | string[] | { [key: string]: StorageValue } = {}
 ): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -12,6 +15,15 @@ export async function getFromStorage<T = unknown>(
       reject(err);
     }
   });
+}
+
+export async function getFromStorage<T = unknown>(
+  keys: string | string[] | { [key: string]: StorageValue } = {}
+): Promise<T> {
+  // Ensure daily reset is performed before getting storage data
+  await dailyResetManager.ensureDailyReset();
+  
+  return getFromStorageRaw<T>(keys);
 }
 
 export async function setToStorage(items: {
