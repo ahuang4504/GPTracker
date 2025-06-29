@@ -7,6 +7,35 @@ import type {
   VisitCountResponse,
 } from "@/types/storage";
 
+// Retry utility with exponential backoff
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxAttempts: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      if (attempt === maxAttempts) {
+        throw lastError;
+      }
+      
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = baseDelay * Math.pow(2, attempt - 1);
+      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms:`, lastError.message);
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+}
+
 async function pushVisitsInternal(session: Session, syncCounts: boolean): Promise<void> {
   if (!session?.access_token) {
     console.error("No session or access token available for visit sync.");
@@ -26,18 +55,29 @@ async function pushVisitsInternal(session: Session, syncCounts: boolean): Promis
   }
 
   const functionName = syncCounts ? "update_visit_count" : "increment_last_visit_count";
-  const res = await supabase.functions.invoke<SupabaseInvokeResponse>(
-    functionName,
-    {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: { delta },
-    }
-  );
+  
+  try {
+    await withRetry(async () => {
+      const response = await supabase.functions.invoke<SupabaseInvokeResponse>(
+        functionName,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: { delta },
+        }
+      );
+      
+      if (response.error) {
+        throw new Error(`${syncCounts ? "Visit" : "Last visit"} sync failed: ${JSON.stringify(response.error)}`);
+      }
+      
+      return response;
+    }, 3, 1000);
 
-  if (res.error) {
-    console.error(`${syncCounts ? "Visit" : "Last visit"} sync failed:`, res.error);
+    console.log(`${syncCounts ? "Visit" : "Last visit"} sync successful`);
+  } catch (error) {
+    console.error(`${syncCounts ? "Visit" : "Last visit"} sync failed after retries:`, error);
     return;
   }
 
@@ -62,20 +102,28 @@ export async function pushVisits(session: Session): Promise<void> {
 }
 
 export async function readVisits(session: Session): Promise<void> {
-  const { data, error } = await supabase.functions.invoke<VisitCountResponse>(
-    "read_curr_date_visit_count",
-    {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: {},
-    }
-  );
+  try {
+    const { data } = await withRetry(async () => {
+      const response = await supabase.functions.invoke<VisitCountResponse>(
+        "read_curr_date_visit_count",
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: {},
+        }
+      );
 
-  if (error) {
-    console.error("Failed to fetch count:", error);
-    return;
+      if (response.error) {
+        throw new Error(`Failed to fetch count: ${JSON.stringify(response.error)}`);
+      }
+
+      return response;
+    }, 3, 1000);
+
+    await setToStorage({ displayCount: data?.count ?? 0 });
+    console.log("Visit count fetch successful");
+  } catch (error) {
+    console.error("Failed to fetch count after retries:", error);
   }
-
-  await setToStorage({ displayCount: data?.count ?? 0 });
 }
