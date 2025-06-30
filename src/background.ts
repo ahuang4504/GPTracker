@@ -84,10 +84,18 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   switch (alarm.name) {
     case "hourlyPush":
     case "finalPush":
-      await pushVisits(session);
+      try {
+        await pushVisits(session);
+      } catch (error) {
+        console.error("Push visits failed, will retry on next alarm:", error);
+      }
       break;
     case "tenMinFetch":
-      await readVisits(session);
+      try {
+        await readVisits(session);
+      } catch (error) {
+        console.error("Read visits failed, will retry on next alarm:", error);
+      }
       break;
   }
 });

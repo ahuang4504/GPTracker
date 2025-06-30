@@ -77,7 +77,7 @@ async function pushVisitsInternal(session: Session, syncCounts: boolean): Promis
     console.log(`${syncCounts ? "Visit" : "Last visit"} sync successful`);
   } catch (error) {
     console.error(`${syncCounts ? "Visit" : "Last visit"} sync failed after retries:`, error);
-    return;
+    throw error;
   }
 
   // SYNC COUNTS NOW (PULL FROM DB AND UPDATE DISPLAY COUNT, LOCAL COUNT, AND LAST SYNCED COUNT)
