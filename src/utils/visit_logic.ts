@@ -25,7 +25,6 @@ async function withRetry<T>(
         throw lastError;
       }
       
-      // Exponential backoff: 1s, 2s, 4s
       const delay = baseDelay * Math.pow(2, attempt - 1);
       console.log(`Attempt ${attempt} failed, retrying in ${delay}ms:`, lastError.message);
       

@@ -73,11 +73,13 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  
-  // Ensure daily reset with session if available
+
   await dailyResetManager.ensureDailyReset(session || undefined);
-  
+
   if (!session) return;
+
+  console.log("Alarm triggered:", alarm.name);
+  console.log("Time:", new Date().toLocaleTimeString());
 
   switch (alarm.name) {
     case "hourlyPush":

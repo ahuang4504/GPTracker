@@ -21,32 +21,31 @@ class DailyResetManager {
 
   private async initialize(): Promise<void> {
     if (this.initialized) return;
-    
+
     try {
       const storage = await getFromStorageRaw<StorageLastDate>(["lastDateStr"]);
       this.lastResetDate = storage.lastDateStr ?? null;
       this.initialized = true;
     } catch (error) {
       console.error("Failed to initialize DailyResetManager:", error);
-      this.initialized = true; // Still mark as initialized to prevent infinite loops
+      this.initialized = true;
     }
   }
 
-
   async ensureDailyReset(session?: Session): Promise<void> {
     await this.initialize();
-    
+
     if (this.isResetting) {
       // Wait for ongoing reset to complete
       while (this.isResetting) {
-        await new Promise<void>(resolve => setTimeout(resolve, 10));
+        await new Promise<void>((resolve) => setTimeout(resolve, 10));
       }
       return;
     }
-    
+
     const today: string = formatDate(new Date());
     if (this.lastResetDate === today) {
-      return; // Already reset today
+      return;
     }
 
     this.isResetting = true;
@@ -59,30 +58,29 @@ class DailyResetManager {
               "visitCount",
               "lastSyncedCount",
             ]);
-            
+
             const visitCount = storage.visitCount ?? 0;
             const lastSyncedCount = storage.lastSyncedCount ?? 0;
-            
+
             if (visitCount !== lastSyncedCount) {
               console.log("Syncing leftover visits before daily reset");
               await pushLastVisits(session);
             }
           } catch (error) {
             console.error("Failed to sync leftover visits:", error);
-            // Continue with reset even if sync fails
           }
         }
-        
+
         await resetCounts();
         this.lastResetDate = today;
-        
-        // Store the reset date in Chrome storage
+
         await setToStorage({ lastDateStr: today });
-        
+
         console.log("Daily reset completed for", today);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       console.error("Failed to perform daily reset:", errorMessage);
       throw error;
     } finally {
