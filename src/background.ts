@@ -1,8 +1,9 @@
-import { getFromStorage, setToStorage } from "./utils/localStorage";
+import { getFromStorage, setToStorage, getSyncStorage } from "./utils/localStorage";
 import { supabase } from "./utils/supabase";
 import { pushVisits, readVisits } from "./utils/visit_logic";
 import { getTimeUntil } from "./utils/timeUtils";
-import { dailyResetManager } from "./utils/dailyResetManager";
+// import { dailyResetManager } from "./utils/dailyResetManager";
+import type { SyncStorageData } from "./types/storage";
 
 let lastTabId: number | null = null;
 
@@ -51,11 +52,22 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 async function updateVisitCount() {
   try {
+    // Check if ChatGPT is blocked
+    const { chatgptBlocked } = await getSyncStorage<SyncStorageData>([
+      "chatgptBlocked",
+    ]);
+    
+    if (chatgptBlocked === true) {
+      console.log("ChatGPT is blocked, not counting visit");
+      return;
+    }
+
     const { visitCount } = await getFromStorage<{ visitCount: number }>([
       "visitCount",
     ]);
     const newCount = (visitCount ?? 0) + 1;
     await setToStorage({ visitCount: newCount });
+    console.log("Visit count updated to:", newCount);
   } catch (err) {
     console.error("Failed to update visit count", err);
   }
@@ -74,7 +86,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     data: { session },
   } = await supabase.auth.getSession();
 
-  await dailyResetManager.ensureDailyReset(session || undefined);
+  // await dailyResetManager.ensureDailyReset(session || undefined);
 
   if (!session) return;
 

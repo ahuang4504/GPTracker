@@ -20,10 +20,9 @@
     {
       "matches": ["https://chatgpt.com/*"],
       "js": ["content.js"],
-      "run_at": "document_idle",
-      "type": "module"
+      "run_at": "document_start"
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab", "tabs", "contextMenus", "identity"],
+  "permissions": ["storage", "scripting", "activeTab", "tabs", "contextMenus", "identity", "alarms"],
   "host_permissions": ["http://*/*", "https://*/*"]
 }

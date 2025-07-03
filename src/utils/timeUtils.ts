@@ -6,7 +6,6 @@ export function isNewDay(lastDateStr?: string): boolean {
 export async function resetCounts(): Promise<void> {
   try {
     const items = {
-      displayCount: 0,
       visitCount: 0,
       lastSyncedCount: 0
     };

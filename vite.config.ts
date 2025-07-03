@@ -10,13 +10,14 @@ export default defineConfig({
     },
   },
   build: {
+    target: "esnext",
     outDir: "dist",
     sourcemap: true,
     rollupOptions: {
       input: {
         main: "index.html",
         content: "src/content.ts",
-        background: "src/background.ts",
+        background: "src/background-simple.ts",
       },
       output: {
         entryFileNames: `[name].js`,

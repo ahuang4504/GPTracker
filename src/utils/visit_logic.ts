@@ -14,81 +14,107 @@ async function withRetry<T>(
   baseDelay: number = 1000
 ): Promise<T> {
   let lastError: Error;
-  
+
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await operation();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       if (attempt === maxAttempts) {
         throw lastError;
       }
-      
+
       const delay = baseDelay * Math.pow(2, attempt - 1);
-      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms:`, lastError.message);
-      
-      await new Promise(resolve => setTimeout(resolve, delay));
+      console.log(
+        `Attempt ${attempt} failed, retrying in ${delay}ms:`,
+        lastError.message
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError!;
 }
 
-async function pushVisitsInternal(session: Session, syncCounts: boolean): Promise<void> {
+async function pushVisitsInternal(
+  session: Session,
+  syncCounts: boolean
+): Promise<void> {
   if (!session?.access_token) {
     console.error("No session or access token available for visit sync.");
     return;
   }
 
-  const storage = await getFromStorageRaw<VisitStorageData>([
-    "visitCount",
-    "lastSyncedCount",
-  ]);
-  const visitCount = storage.visitCount ?? 0;
-  const lastSyncedCount = storage.lastSyncedCount ?? 0;
+  let delta: number;
 
-  const delta = visitCount - lastSyncedCount;
+  if (syncCounts) {
+    // Regular sync: calculate delta from current counts
+    const storage = await getFromStorageRaw<VisitStorageData>([
+      "visitCount",
+      "lastSyncedCount",
+    ]);
+    const visitCount = storage.visitCount ?? 0;
+    const lastSyncedCount = storage.lastSyncedCount ?? 0;
+    delta = visitCount - lastSyncedCount;
+  } else {
+    // Push last visits: use stored leftover counts
+    const storage = await getFromStorageRaw<{ leftoverCounts?: number }>([
+      "leftoverCounts",
+    ]);
+    delta = storage.leftoverCounts ?? 0;
+  }
+
   if (delta <= 0) {
     return;
   }
 
-  const functionName = syncCounts ? "update_visit_count" : "increment_last_visit_count";
-  
+  const functionName = syncCounts
+    ? "update_visit_count"
+    : "increment_last_visit_count";
+
   try {
-    await withRetry(async () => {
-      const response = await supabase.functions.invoke<SupabaseInvokeResponse>(
-        functionName,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: { delta },
+    await withRetry(
+      async () => {
+        const response =
+          await supabase.functions.invoke<SupabaseInvokeResponse>(
+            functionName,
+            {
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: { delta },
+            }
+          );
+
+        if (response.error) {
+          throw new Error(
+            `${
+              syncCounts ? "Visit" : "Last visit"
+            } sync failed: ${JSON.stringify(response.error)}`
+          );
         }
-      );
-      
-      if (response.error) {
-        throw new Error(`${syncCounts ? "Visit" : "Last visit"} sync failed: ${JSON.stringify(response.error)}`);
-      }
-      
-      return response;
-    }, 3, 1000);
+
+        return response;
+      },
+      3,
+      1000
+    );
 
     console.log(`${syncCounts ? "Visit" : "Last visit"} sync successful`);
   } catch (error) {
-    console.error(`${syncCounts ? "Visit" : "Last visit"} sync failed after retries:`, error);
+    console.error(
+      `${syncCounts ? "Visit" : "Last visit"} sync failed after retries:`,
+      error
+    );
     throw error;
   }
 
-  // SYNC COUNTS NOW (PULL FROM DB AND UPDATE DISPLAY COUNT, LOCAL COUNT, AND LAST SYNCED COUNT)
+  // After successful push, read the updated cloud count
   if (syncCounts) {
-    await readVisits(session);
-    const displayStorage = await getFromStorageRaw<VisitStorageData>([
-      "displayCount",
-    ]);
-    const displayCount = displayStorage.displayCount ?? 0;
-    await setToStorage({ lastSyncedCount: displayCount });
-    await setToStorage({ visitCount: displayCount });
+    await readVisits(session); // This sets both visitCount and lastSyncedCount to cloud count
+    console.log("Sync completed: visitCount and lastSyncedCount updated from cloud");
   }
 }
 
@@ -102,25 +128,35 @@ export async function pushVisits(session: Session): Promise<void> {
 
 export async function readVisits(session: Session): Promise<void> {
   try {
-    const { data } = await withRetry(async () => {
-      const response = await supabase.functions.invoke<VisitCountResponse>(
-        "read_curr_date_visit_count",
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: {},
+    const { data } = await withRetry(
+      async () => {
+        const response = await supabase.functions.invoke<VisitCountResponse>(
+          "read_curr_date_visit_count",
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: {},
+          }
+        );
+
+        if (response.error) {
+          throw new Error(
+            `Failed to fetch count: ${JSON.stringify(response.error)}`
+          );
         }
-      );
 
-      if (response.error) {
-        throw new Error(`Failed to fetch count: ${JSON.stringify(response.error)}`);
-      }
+        return response;
+      },
+      3,
+      1000
+    );
 
-      return response;
-    }, 3, 1000);
-
-    await setToStorage({ displayCount: data?.count ?? 0 });
+    const cloudCount = data?.count ?? 0;
+    await setToStorage({ 
+      visitCount: cloudCount,
+      lastSyncedCount: cloudCount 
+    });
     console.log("Visit count fetch successful");
   } catch (error) {
     console.error("Failed to fetch count after retries:", error);

@@ -2,7 +2,7 @@ import { supabase } from "@/utils/supabase";
 
 export async function signInWithGoogle() {
   const redirectTo = chrome.identity.getRedirectURL("callback");
-  console.log("Redirect URL for Google login:", redirectTo);
+  // console.log("Redirect URL for Google login:", redirectTo);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -22,7 +22,7 @@ export async function signInWithGoogle() {
       interactive: true,
     },
     async (redirectUrl) => {
-      console.log("Redirect URL:", redirectUrl);
+      // console.log("Redirect URL:", redirectUrl);
       if (!redirectUrl) {
         console.error("No redirect URL received from auth flow");
         return;

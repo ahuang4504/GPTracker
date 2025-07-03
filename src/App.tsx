@@ -3,6 +3,7 @@ import { supabase } from "@/utils/supabase";
 import { AuthPanel } from "@/components/authPanel";
 import { Dashboard } from "@/components/dashboard";
 import type { Session } from "@supabase/supabase-js";
+import { listenToAuthChanges } from "./utils/authListener";
 import "./App.css";
 
 function App() {
@@ -15,14 +16,15 @@ function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    } = listenToAuthChanges(setSession);
 
     return () => subscription.unsubscribe();
   }, []);
 
+  console.log("App rendering, session:", session ? "exists" : "null");
+
   if (!session) {
+    console.log("Showing AuthPanel");
     return (
       <AuthPanel
         onLogin={() =>
@@ -34,6 +36,7 @@ function App() {
     );
   }
 
+  console.log("Showing Dashboard");
   return <Dashboard session={session} setSession={setSession} />;
 }
 
