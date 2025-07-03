@@ -8,7 +8,11 @@ export async function getFromStorage<T = unknown>(
   return new Promise((resolve, reject) => {
     try {
       chrome.storage.local.get(keys, (result) => {
-        resolve(result as T);
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve(result as T);
+        }
       });
     } catch (err) {
       reject(err);
@@ -24,7 +28,13 @@ export async function setToStorage(items: {
 }): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      chrome.storage.local.set(items, () => resolve());
+      chrome.storage.local.set(items, () => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
     } catch (err) {
       reject(err);
     }
@@ -38,7 +48,11 @@ export async function getSyncStorage<T = SyncStorageData>(
   return new Promise((resolve, reject) => {
     try {
       chrome.storage.sync.get(keys, (result) => {
-        resolve(result as T);
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve(result as T);
+        }
       });
     } catch (err) {
       reject(err);
@@ -51,7 +65,13 @@ export async function setSyncStorage(items: {
 }): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      chrome.storage.sync.set(items, () => resolve());
+      chrome.storage.sync.set(items, () => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
     } catch (err) {
       reject(err);
     }

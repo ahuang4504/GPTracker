@@ -23,6 +23,13 @@
       "run_at": "document_start"
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab", "tabs", "contextMenus", "identity", "alarms"],
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "tabs",
+    "identity",
+    "alarms"
+  ],
   "host_permissions": ["http://*/*", "https://*/*"]
 }

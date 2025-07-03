@@ -20,16 +20,17 @@ export function AuthPanel({ onLogin }: Props) {
       return;
     }
 
-    const { error } = isSignUp
+    const { data, error } = isSignUp
       ? await supabase.auth.signUp({ email, password })
       : await supabase.auth.signInWithPassword({ email, password });
 
-    // console.log("Auth response:", data, error);
-
     if (error) {
       setError(error.message);
+    } else if (data.user && data.session) {
+      // Verify auth state before calling onLogin
+      onLogin();
     } else {
-      onLogin(); 
+      setError("Authentication failed. Please try again.");
     }
   };
 
@@ -105,8 +106,22 @@ export function AuthPanel({ onLogin }: Props) {
 
       <button
         onClick={async () => {
-          await signInWithGoogle();
-          onLogin();
+          try {
+            const result = (await signInWithGoogle()) as {
+              data?: { user?: unknown; session?: unknown };
+              error?: { message: string };
+            };
+            if (result.error) {
+              setError(result.error.message);
+            } else if (result.data?.user && result.data?.session) {
+              // Verify auth state before calling onLogin
+              onLogin();
+            } else {
+              setError("Google authentication failed. Please try again.");
+            }
+          } catch (err) {
+            setError(`Google authentication failed. Please try again: ${err}`);
+          }
         }}
         className="auth-button google"
       >
