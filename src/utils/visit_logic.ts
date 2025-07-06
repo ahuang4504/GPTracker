@@ -111,9 +111,8 @@ async function pushVisitsInternal(
     throw error;
   }
 
-  // After successful push, read the updated cloud count
   if (syncCounts) {
-    await readVisits(session); // This sets both visitCount and lastSyncedCount to cloud count
+    await readVisits(session);
     console.log("Sync completed: visitCount and lastSyncedCount updated from cloud");
   }
 }

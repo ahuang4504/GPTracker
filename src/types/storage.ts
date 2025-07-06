@@ -22,3 +22,16 @@ export interface SupabaseInvokeResponse<T = unknown> {
 export interface VisitCountResponse {
   count?: number;
 }
+
+// Chart data types
+export interface VisitHistoryEntry {
+  date: string;
+  visits: number;
+}
+
+export interface VisitHistoryResponse {
+  data?: VisitHistoryEntry[];
+  error?: unknown;
+}
+
+export type TimePeriod = '1W' | '1M' | '1Y';

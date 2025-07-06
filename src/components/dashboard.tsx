@@ -8,9 +8,9 @@ import {
 } from "@/utils/localStorage";
 import type { Session } from "@supabase/supabase-js";
 import type { SyncStorageData } from "@/types/storage";
-// Auth listener not needed - managed by parent App component
 import { pushVisits, pushLastVisits } from "@/utils/visit_logic";
 import { ensureDailyReset } from "@/utils/dailyReset";
+import { VisitChart } from "./VisitChart";
 
 export function Dashboard({
   session,
@@ -41,10 +41,8 @@ export function Dashboard({
           `Found ${leftoverCounts} leftover counts from ${leftoverDate}, syncing...`
         );
 
-        // Push leftover counts to Supabase
         await pushLastVisits(session);
 
-        // Clear leftover flags
         await setToStorage({
           hasUnpushedCounts: false,
           leftoverCounts: 0,
@@ -65,12 +63,10 @@ export function Dashboard({
     try {
       console.log("Performing Supabase sync...");
 
-      // Push current local visits to Supabase (this also reads updated count)
       await pushVisits(session);
       console.log("Successfully pushed and synced visits with Supabase");
     } catch (error) {
       console.error("Supabase sync failed:", error);
-      // Don't throw - let the app continue working with local data
     } finally {
       setIsSyncing(false);
     }
@@ -80,14 +76,12 @@ export function Dashboard({
     console.log("Dashboard useEffect running...");
     (async () => {
       try {
-        // Ensure daily reset is performed before loading data
         await ensureDailyReset();
 
         await handleLeftoverCounts();
 
         await performSupabaseSync();
 
-        // Load visit count directly from storage
         const { visitCount } = await getFromStorage<{
           visitCount?: number;
         }>(["visitCount"]);
@@ -109,16 +103,11 @@ export function Dashboard({
     })();
   }, [handleLeftoverCounts, performSupabaseSync]);
 
-  const handleManualSync = async () => {
-    await performSupabaseSync();
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setSession(null);
   };
-
-  // Removed duplicate useEffect - visit count is already loaded in the main useEffect above
 
   const handleBlockingToggle = async () => {
     try {
@@ -127,10 +116,20 @@ export function Dashboard({
       await setSyncStorage({ chatgptBlocked: newBlockedState });
     } catch (error) {
       console.error("Failed to update blocking state:", error);
-      // Revert state on error
       setIsBlocked(!isBlocked);
     }
   };
+
+  if (isLoading || isSyncing) {
+    return (
+      <div className="dashboard">
+        <div className="loading-state">
+          <h2>Loading...</h2>
+          <p>{isSyncing ? "Syncing with cloud..." : "Loading dashboard..."}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
@@ -138,38 +137,26 @@ export function Dashboard({
       <p>You are logged in as {session?.user?.email || "Unknown"}</p>
 
       <div className="visit-count">
-        <p>You have visited ChatGPT {visitCount ?? 0} times.</p>
-        <button
-          onClick={handleManualSync}
-          disabled={isSyncing}
-          className="auth-button"
-          style={{
-            marginTop: "0.5rem",
-            fontSize: "0.9rem",
-            padding: "0.5rem 1rem",
-          }}
-        >
-          {isSyncing ? "Syncing..." : "Sync with Cloud"}
-        </button>
+        <p>You have visited ChatGPT {visitCount ?? 0} times today.</p>
       </div>
 
-      {!isLoading && (
-        <div className="blocking-toggle">
-          <label className="toggle-container">
-            <span className="toggle-label">Block ChatGPT Access</span>
-            <input
-              type="checkbox"
-              checked={isBlocked}
-              onChange={handleBlockingToggle}
-              className="toggle-checkbox"
-            />
-            <span className="toggle-slider"></span>
-          </label>
-          {isBlocked && (
-            <p className="blocking-status">ChatGPT is currently blocked</p>
-          )}
-        </div>
-      )}
+      <VisitChart session={session} />
+
+      <div className="blocking-toggle">
+        <label className="toggle-container">
+          <span className="toggle-label">Block ChatGPT Access</span>
+          <input
+            type="checkbox"
+            checked={isBlocked}
+            onChange={handleBlockingToggle}
+            className="toggle-checkbox"
+          />
+          <span className="toggle-slider"></span>
+        </label>
+        {isBlocked && (
+          <p className="blocking-status">ChatGPT is currently blocked</p>
+        )}
+      </div>
 
       <button onClick={handleLogout} className="auth-button logout">
         Log Out
