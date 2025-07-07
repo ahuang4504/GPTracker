@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/utils/supabase";
 import {
   getFromStorage,
@@ -24,6 +24,7 @@ export function Dashboard({
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const hasInitialized = useRef<boolean>(false);
 
   const handleLeftoverCounts = useCallback(async () => {
     if (!session) return;
@@ -56,9 +57,12 @@ export function Dashboard({
     }
   }, [session]);
 
+  const syncInProgress = useRef<boolean>(false);
+  
   const performSupabaseSync = useCallback(async () => {
-    if (!session) return;
+    if (!session || syncInProgress.current) return;
 
+    syncInProgress.current = true;
     setIsSyncing(true);
     try {
       console.log("Performing Supabase sync...");
@@ -68,12 +72,19 @@ export function Dashboard({
     } catch (error) {
       console.error("Supabase sync failed:", error);
     } finally {
+      syncInProgress.current = false;
       setIsSyncing(false);
     }
   }, [session]);
 
   useEffect(() => {
+    if (hasInitialized.current) {
+      return;
+    }
+    
+    hasInitialized.current = true;
     console.log("Dashboard useEffect running...");
+    
     (async () => {
       try {
         await ensureDailyReset();

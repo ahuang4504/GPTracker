@@ -58,12 +58,14 @@ async function pushVisitsInternal(
     const visitCount = storage.visitCount ?? 0;
     const lastSyncedCount = storage.lastSyncedCount ?? 0;
     delta = visitCount - lastSyncedCount;
+    console.log(`[SYNC] Calculating delta: visitCount(${visitCount}) - lastSyncedCount(${lastSyncedCount}) = ${delta}`);
   } else {
     // Push last visits: use stored leftover counts
     const storage = await getFromStorageRaw<{ leftoverCounts?: number }>([
       "leftoverCounts",
     ]);
     delta = storage.leftoverCounts ?? 0;
+    console.log(`[SYNC] Using leftover counts delta: ${delta}`);
   }
 
   if (delta <= 0) {
@@ -102,7 +104,7 @@ async function pushVisitsInternal(
       1000
     );
 
-    console.log(`${syncCounts ? "Visit" : "Last visit"} sync successful`);
+    console.log(`[SYNC] ${syncCounts ? "Visit" : "Last visit"} sync successful - pushed delta: ${delta}`);
   } catch (error) {
     console.error(
       `${syncCounts ? "Visit" : "Last visit"} sync failed after retries:`,
@@ -152,6 +154,7 @@ export async function readVisits(session: Session): Promise<void> {
     );
 
     const cloudCount = data?.count ?? 0;
+    console.log(`[SYNC] Updating local storage with cloud count: ${cloudCount}`);
     await setToStorage({ 
       visitCount: cloudCount,
       lastSyncedCount: cloudCount 
