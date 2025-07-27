@@ -32,8 +32,10 @@ body {
 #root {
   background: transparent;
   color: #1e3932;
-  padding: 2rem;
+  padding: 1.5rem;
   min-height: 100vh;
+  width: 300px;
+  margin: 0 auto;
 }
 
 .logo {
@@ -80,15 +82,24 @@ body {
   box-shadow: none;
   margin: 0;
   padding: 0;
-  max-width: none;
+  width: 100%;
+}
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
 .auth-title {
   font-size: 1.5rem;
-  font-weight: normal;
-  margin-bottom: 1.5rem;
+  font-weight: bold;
+  margin: 0;
   color: #1e3932;
   text-align: left;
+  text-shadow: 0 2px 4px rgba(30, 57, 50, 0.15);
 }
 
 .auth-form {
@@ -102,7 +113,7 @@ body {
   background: transparent;
   border: none;
   border-bottom: 1px solid #1e3932;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
   font-size: 1rem;
   color: #1e3932;
   outline: none;
@@ -120,51 +131,84 @@ body {
 
 .auth-button {
   background: transparent;
-  border: 1px solid #1e3932;
+  border: none;
   color: #1e3932;
-  padding: 0.75rem 0;
+  padding: 1rem 0;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
   font-family: 'Cutive Mono', monospace;
   margin-bottom: 0.5rem;
   transition: all 0.2s ease;
+  text-shadow: 0 1px 1px rgba(30, 57, 50, 0.08);
 }
 
 .auth-button:hover {
-  background: #1e3932;
-  color: #d4e9e2;
+  opacity: 0.7;
+  text-shadow: 0 2px 4px rgba(30, 57, 50, 0.15);
 }
 
 .auth-button.google {
-  border-color: #a8b5d1;
   color: #5a6b8c;
 }
 
 .auth-button.google:hover {
-  background: #a8b5d1;
-  color: #d4e9e2;
+  opacity: 0.7;
+}
+
+.google-auth-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sparkle-google {
+  position: absolute;
+  right: -1rem;
+  top: -0.5rem;
 }
 
 .logout-link {
   display: inline-block;
-  margin-top: 1rem;
+  margin: 0;
   color: #d66b6b;
   font-size: 0.875rem;
   font-weight: bold;
   text-decoration: underline;
   cursor: pointer;
   font-family: 'Cutive Mono', monospace;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 1px rgba(214, 107, 107, 0.1);
 }
 
 .logout-link:hover {
   opacity: 0.7;
+  text-shadow: 0 2px 4px rgba(214, 107, 107, 0.2);
+}
+
+.logout-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  max-width: 250px;
+}
+
+.sparkle-logout {
+  margin-left: auto;
+  margin-right: -1rem;
+  width: 80px !important;
+  height: 40px !important;
+  object-fit: cover;
+  object-position: center;
 }
 
 .auth-divider {
-  text-align: center;
-  margin: 1.5rem 0;
-  font-size: 0.875rem;
+  text-align: left;
+  margin: 1.5rem 0 0.75rem 0;
+  font-size: 1rem;
   color: #1e3932;
   opacity: 0.7;
 }
@@ -181,21 +225,24 @@ body {
   color: #1e3932;
   cursor: pointer;
   font-size: 0.875rem;
+  font-weight: bold;
   text-align: left;
   font-family: 'Cutive Mono', monospace;
-  text-decoration: underline;
+  text-decoration: none;
   opacity: 0.8;
   padding: 0;
+  text-shadow: 0 1px 1px rgba(30, 57, 50, 0.05);
 }
 
 .auth-text-button:hover {
   opacity: 1;
+  text-shadow: 0 1px 2px rgba(30, 57, 50, 0.15);
 }
 
 .auth-error {
   color: #d66b6b;
   margin-top: 1rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   background: transparent;
   padding: 0;
   border: none;
@@ -204,7 +251,7 @@ body {
 .auth-success {
   color: #2d5a47;
   margin-top: 1rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   background: transparent;
   padding: 0;
   border: none;
@@ -216,13 +263,48 @@ body {
   padding: 0;
   margin: 0;
   text-align: left;
+  width: 100%;
 }
 
 .dashboard-header {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 0.25rem;
   margin-bottom: 1rem;
+  position: relative;
+}
+
+.dashboard-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+.chatgpt-icon {
+  width: 28px;
+  height: 28px;
+  opacity: 0.3;
+  filter: grayscale(20%) drop-shadow(0 1px 1px rgba(30, 57, 50, 0.1));
+  transition: all 0.2s ease;
+}
+
+.chatgpt-icon:hover {
+  opacity: 0.4;
+  filter: grayscale(10%) drop-shadow(0 1px 2px rgba(30, 57, 50, 0.15));
+}
+
+.sparkle-icon {
+  width: 140px;
+  height: 140px;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(30, 57, 50, 0.15));
+  border-radius: 50%;
+}
+
+.sparkle-icon:hover {
+  opacity: 0.5;
 }
 
 .dashboard h1 {
@@ -230,13 +312,17 @@ body {
   font-weight: bold;
   margin: 0;
   color: #1e3932;
+  text-shadow: 0 2px 4px rgba(30, 57, 50, 0.15);
 }
 
 .login-status {
   color: #1e3932;
   opacity: 0.7;
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   font-weight: normal;
+  word-break: break-all;
+  line-height: 1.2;
+  margin-left: 2.5rem;
 }
 
 .loading-state {
@@ -272,10 +358,11 @@ body {
   font-weight: bold;
   color: #1e3932;
   margin: 0;
+  text-shadow: 0 1px 1px rgba(30, 57, 50, 0.08);
 }
 
 .blocking-toggle {
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   background: transparent;
   border: none;
   padding: 0;
@@ -293,6 +380,7 @@ body {
   color: #1e3932;
   font-size: 0.875rem;
   font-weight: bold;
+  text-shadow: 0 1px 1px rgba(30, 57, 50, 0.08);
 }
 
 .toggle-checkbox {
@@ -310,6 +398,11 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(30, 57, 50, 0.15);
+}
+
+.toggle-container:hover .toggle-slider {
+  box-shadow: 0 3px 8px rgba(30, 57, 50, 0.2);
 }
 
 .toggle-text {
@@ -355,6 +448,7 @@ body {
 .toggle-checkbox:checked + .toggle-slider {
   background: transparent;
   border-color: #2d5a47;
+  box-shadow: inset 0 1px 3px rgba(45, 90, 71, 0.2), 0 1px 3px rgba(30, 57, 50, 0.1);
 }
 
 .toggle-checkbox:checked + .toggle-slider::before {
@@ -376,11 +470,27 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.chart-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.chart-title-container .sparkle-icon {
+  position: absolute;
+  right: 0.5rem;
+  top: -2rem;
+  z-index: 1;
+}
+
 .chart-header h3 {
   font-size: 1rem;
   font-weight: bold;
   color: #1e3932;
-  margin-bottom: 1rem;
+  margin: 0;
+  text-shadow: 0 1px 1px rgba(30, 57, 50, 0.08);
 }
 
 .period-tabs {
@@ -401,16 +511,19 @@ body {
   padding: 0.25rem 0;
   font-family: 'Cutive Mono', monospace;
   transition: all 0.2s ease;
+  text-shadow: 0 1px 1px rgba(30, 57, 50, 0.05);
 }
 
 .period-tab:hover {
   opacity: 0.8;
   border-bottom-color: #1e3932;
+  text-shadow: 0 1px 2px rgba(30, 57, 50, 0.15);
 }
 
 .period-tab.active {
   opacity: 1;
   border-bottom-color: #1e3932;
+  text-shadow: 0 1px 2px rgba(30, 57, 50, 0.15);
 }
 
 .period-tab:disabled {
@@ -423,6 +536,8 @@ body {
   width: 100%;
   position: relative;
   margin-top: 1rem;
+  box-shadow: 0 3px 6px rgba(30, 57, 50, 0.1);
+  border-radius: 3px;
 }
 
 .chart-loading {
@@ -459,6 +574,28 @@ body {
   color: #d4e9e2;
 }
 
+/* GPTracker Logo */
+.gptracker-logo-container {
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gptracker-logo {
+  width: 160px;
+  height: auto;
+  opacity: 0.4;
+  filter: drop-shadow(0 1px 2px rgba(30, 57, 50, 0.1));
+  transition: opacity 0.3s ease;
+}
+
+.gptracker-logo:hover {
+  opacity: 0.6;
+}
+
 /* Responsive adjustments */
 @media (max-width: 450px) {
   #root {
@@ -479,5 +616,13 @@ body {
 
   .chart-container {
     height: 150px;
+  }
+
+  .gptracker-logo-container {
+    margin-top: 1rem;
+  }
+  
+  .gptracker-logo {
+    width: 140px;
   }
 }

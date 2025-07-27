@@ -142,7 +142,10 @@ export function VisitChart({ session }: VisitChartProps) {
   return (
     <div className="visit-chart">
       <div className="chart-header">
-        <h3>► Visit History</h3>
+        <div className="chart-title-container">
+          <h3>► Visit History</h3>
+          <img src="/sparkle.png" className="sparkle-icon" alt="" />
+        </div>
         <div className="period-tabs">
           {periods.map((period) => (
             <button

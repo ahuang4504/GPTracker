@@ -4,12 +4,12 @@
   "version": "0.0.1",
   "description": "Track how often you use ChatGPT and for what.",
   "icons": {
-    "32": "images/icon-32.png"
+    "32": "chatgpt.png"
   },
   "action": {
     "default_popup": "./index.html",
     "default_icon": {
-      "32": "images/icon-32.png"
+      "32": "chatgpt.png"
     }
   },
   "background": {

@@ -145,7 +145,10 @@ export function Dashboard({
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Welcome!</h1>
+        <div className="dashboard-title-row">
+          <img src="/chatgpt.svg" className="chatgpt-icon" alt="" />
+          <h1>Welcome!</h1>
+        </div>
         <span className="login-status">({session?.user?.email || "Unknown"})</span>
       </div>
 
@@ -171,9 +174,15 @@ export function Dashboard({
         </label>
       </div>
 
-      <a onClick={handleLogout} className="logout-link">
-        ► Log Out
-      </a>
+      <div className="logout-section">
+        <a onClick={handleLogout} className="logout-link">
+          ► Log Out
+        </a>
+      </div>
+      
+      <div className="gptracker-logo-container">
+        <img src="/GPTracker.png" className="gptracker-logo" alt="GPTracker" />
+      </div>
     </div>
   );
 }

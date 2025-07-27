@@ -53,7 +53,10 @@ export function AuthPanel({ onLogin }: Props) {
 
   return (
     <div className="login-container">
-      <h2 className="auth-title">{isSignUp ? "Sign Up" : "Log In"}</h2>
+      <div className="auth-header">
+        <img src="/chatgpt.svg" className="chatgpt-icon" alt="" />
+        <h2 className="auth-title">► {isSignUp ? "Sign Up" : "Log In"}</h2>
+      </div>
 
       <form
         onSubmit={(e) => {
@@ -64,21 +67,21 @@ export function AuthPanel({ onLogin }: Props) {
       >
         <input
           type="email"
-          placeholder="Email"
+          placeholder="► Email"
           className="auth-input"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="► Password"
           className="auth-input"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button type="submit" className="auth-button">
-          {isSignUp ? "Sign Up with Email" : "Log In with Email"}
+          ► {isSignUp ? "Sign Up with Email" : "Log In with Email"}
         </button>
       </form>
 
@@ -88,7 +91,7 @@ export function AuthPanel({ onLogin }: Props) {
           className="auth-text-button"
           onClick={() => setIsSignUp(!isSignUp)}
         >
-          {isSignUp ? "Already have an account? Log In" : "No account? Sign Up"}
+          ► {isSignUp ? "Already have an account? Log In" : "No account? Sign Up"}
         </button>
 
         <button
@@ -96,7 +99,7 @@ export function AuthPanel({ onLogin }: Props) {
           className="auth-text-button"
           onClick={handleResetPassword}
         >
-          Forgot password?
+          ► Forgot password?
         </button>
 
         {resetSent && <p className="auth-success">Reset email sent!</p>}
@@ -104,31 +107,38 @@ export function AuthPanel({ onLogin }: Props) {
 
       <div className="auth-divider">OR</div>
 
-      <button
-        onClick={async () => {
-          try {
-            const result = (await signInWithGoogle()) as {
-              data?: { user?: unknown; session?: unknown };
-              error?: { message: string };
-            };
-            if (result.error) {
-              setError(result.error.message);
-            } else if (result.data?.user && result.data?.session) {
-              // Verify auth state before calling onLogin
-              onLogin();
-            } else {
-              setError("Google authentication failed. Please try again.");
+      <div className="google-auth-container">
+        <button
+          onClick={async () => {
+            try {
+              const result = (await signInWithGoogle()) as {
+                data?: { user?: unknown; session?: unknown };
+                error?: { message: string };
+              };
+              if (result.error) {
+                setError(result.error.message);
+              } else if (result.data?.user && result.data?.session) {
+                // Verify auth state before calling onLogin
+                onLogin();
+              } else {
+                setError("Google authentication failed. Please try again.");
+              }
+            } catch (err) {
+              setError(`Google authentication failed. Please try again: ${err}`);
             }
-          } catch (err) {
-            setError(`Google authentication failed. Please try again: ${err}`);
-          }
-        }}
-        className="auth-button google"
-      >
-        Sign In with Google
-      </button>
+          }}
+          className="auth-button google"
+        >
+          ► Sign In with Google
+        </button>
+        <img src="/sparkle.png" className="sparkle-icon sparkle-google" alt="" />
+      </div>
 
       {error && <p className="auth-error">{error}</p>}
+      
+      <div className="gptracker-logo-container">
+        <img src="/GPTracker.png" className="gptracker-logo" alt="GPTracker" />
+      </div>
     </div>
   );
 }
