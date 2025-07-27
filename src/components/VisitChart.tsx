@@ -76,13 +76,13 @@ export function VisitChart({ session }: VisitChartProps) {
       {
         label: "ChatGPT Visits",
         data: chartData.map((entry) => entry.visits),
-        borderColor: "rgb(59, 130, 246)",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        borderColor: "#1e3932",
+        backgroundColor: "rgba(30, 57, 50, 0.1)",
         borderWidth: 2,
         fill: true,
         tension: 0.1,
-        pointBackgroundColor: "rgb(59, 130, 246)",
-        pointBorderColor: "rgb(59, 130, 246)",
+        pointBackgroundColor: "#1e3932",
+        pointBorderColor: "#1e3932",
         pointRadius: 4,
         pointHoverRadius: 6,
       },
@@ -102,7 +102,7 @@ export function VisitChart({ session }: VisitChartProps) {
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         titleColor: "white",
         bodyColor: "white",
-        borderColor: "rgba(59, 130, 246, 0.5)",
+        borderColor: "rgba(30, 57, 50, 0.5)",
         borderWidth: 1,
       },
     },
@@ -142,7 +142,7 @@ export function VisitChart({ session }: VisitChartProps) {
   return (
     <div className="visit-chart">
       <div className="chart-header">
-        <h3>Visit History</h3>
+        <h3>► Visit History</h3>
         <div className="period-tabs">
           {periods.map((period) => (
             <button

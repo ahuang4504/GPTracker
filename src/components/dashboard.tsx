@@ -144,34 +144,36 @@ export function Dashboard({
 
   return (
     <div className="dashboard">
-      <h1>Welcome!</h1>
-      <p>You are logged in as {session?.user?.email || "Unknown"}</p>
+      <div className="dashboard-header">
+        <h1>Welcome!</h1>
+        <span className="login-status">({session?.user?.email || "Unknown"})</span>
+      </div>
 
       <div className="visit-count">
-        <p>You have visited ChatGPT {visitCount ?? 0} times today.</p>
+        <p>► You have visited ChatGPT <span style={{textDecoration: 'underline'}}>{visitCount ?? 0}</span> times today.</p>
       </div>
 
       <VisitChart session={session} />
 
       <div className="blocking-toggle">
         <label className="toggle-container">
-          <span className="toggle-label">Block ChatGPT Access</span>
+          <span className="toggle-label">► Block ChatGPT Access</span>
           <input
             type="checkbox"
             checked={isBlocked}
             onChange={handleBlockingToggle}
             className="toggle-checkbox"
           />
-          <span className="toggle-slider"></span>
+          <span className="toggle-slider">
+            <span className="toggle-text toggle-off">Off</span>
+            <span className="toggle-text toggle-on">On</span>
+          </span>
         </label>
-        {isBlocked && (
-          <p className="blocking-status">ChatGPT is currently blocked</p>
-        )}
       </div>
 
-      <button onClick={handleLogout} className="auth-button logout">
-        Log Out
-      </button>
+      <a onClick={handleLogout} className="logout-link">
+        ► Log Out
+      </a>
     </div>
   );
 }
