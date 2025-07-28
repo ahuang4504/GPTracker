@@ -2,6 +2,23 @@
 
 GPTracker is a project I built in my free time for fun to practice my front-end development! It is a Chrome extension that tracks ChatGPT usage patterns with cloud synchronization and data visualization.
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="public/images/dashboard.png" alt="GPTracker Dashboard" width="300"/>
+        <br/>
+        <em>Dashboard with visit tracking and charts</em>
+      </td>
+      <td align="center">
+        <img src="public/images/blockscreen.png" alt="GPTracker Block Screen" width="300"/>
+        <br/>
+        <em>ChatGPT blocking screen</em>
+      </td>
+    </tr>
+  </table>
+</div>
+
 ## Features
 
 - **Visit Tracking**: Automatically counts visits to ChatGPT with intelligent per-tab tracking
@@ -10,6 +27,13 @@ GPTracker is a project I built in my free time for fun to practice my front-end 
 - **Access Control**: Optional ChatGPT blocking functionality
 - **Daily Reset**: Automatic daily count reset with leftover count preservation
 - **Offline Support**: Local storage fallback when offline
+
+## Currently Working On
+
+- **Chrome Web Store Publication**: Working on publishing the extension to make it easily accessible to users
+- **Usage Categorization**: Extracting ChatGPT queries and classifying usage to promote conscious reflection about what the user relies on AI for
+- **UI/UX Improvements**: Possibly adding a dark/light mode option
+- **Enhanced Analytics**: Adding more detailed usage insights and patterns as widgets for users
 
 ## Installation
 
@@ -122,19 +146,16 @@ bun run preview
 ```
 src/
 ├── components/          # React components
-│   ├── AuthPanel.tsx   # Authentication interface
-│   ├── Dashboard.tsx   # Main dashboard component
+│   ├── authPanel.tsx   # Authentication interface
+│   ├── dashboard.tsx   # Main dashboard component
 │   └── VisitChart.tsx  # Chart visualization component
-├── utils/              # Utility functions
-│   ├── chartData.ts    # Chart data processing
+├── utils/              # Core utility functions
 │   ├── dailyReset.ts   # Daily reset logic
-│   ├── localStorage.ts # Storage utilities
 │   ├── supabase.ts     # Supabase configuration
 │   ├── timeUtils.ts    # Date/time utilities
 │   └── visit_logic.ts  # Sync operations
-├── types/              # TypeScript type definitions
 ├── App.tsx             # Main React app
-├── background.ts       # Extension background script
+├── background-simple.ts # Extension background script
 └── content.ts          # Content script
 ```
 
@@ -147,14 +168,14 @@ The extension uses Manifest V3 with the following permissions:
 - `alarms`: For daily reset scheduling
 - `host_permissions`: Access to ChatGPT domain
 
-## Supabase Integration
+<!-- ## Supabase Integration
 
 ### Required Edge Functions
 
 1. **update_visit_count**: Updates daily visit count with delta
 2. **increment_last_visit_count**: Handles leftover counts from previous sessions
 3. **read_curr_date_visit_count**: Fetches current day's visit count
-4. **fetch_visit_history**: Retrieves historical visit data for charts
+4. **fetch_visit_history**: Retrieves historical visit data for charts -->
 
 <!-- ### Database Schema
 
